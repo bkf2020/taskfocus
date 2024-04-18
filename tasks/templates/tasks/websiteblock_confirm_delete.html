@@ -1,0 +1,22 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<title>Taskfocus: Confirm deleting website</title>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+	</head>
+    <body>
+        <main>
+        <h1>Taskfocus: Confirm deleting website</h1>
+        <form method="post">{% csrf_token %}
+            <p>Are you sure you want to delete the website block with regex:</p>
+            <blockquote>{{ object.website_regex }}</blockquote>
+            {{ form.as_p }}
+            <button type="submit" class="bg-red">Yes, delete website</button>
+            <a href="{% url 'tasks-website-list' object.task_id %}" class="buttonLink bg-gray">Cancel</button>
+        </form>
+        </main>
+    </body>
+</html>

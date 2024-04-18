@@ -1,0 +1,42 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        {% if current_task.whitelist %}
+		    <title>Taskfocus: Task Website Whitelist</title>
+        {% else %}
+            <title>Taskfocus: Task Website Blacklist</title>
+        {% endif %}
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+	</head>
+    <body>
+        <main>
+        {% if current_task.whitelist %}
+		    <h1>Taskfocus: Task Website Whitelist</h1>
+        {% else %}
+            <h1>Taskfocus: Task Website Blacklist</h1>
+        {% endif %}
+        <a href="/tasks/">Return to all uncompleted tasks</a>
+        <p>
+            Changing whitelist/blacklist for task: {{ current_task.info }}.
+        </p>
+        <p><i>
+            Start: {{ current_task.start_time|date:"M d, Y; h:i:s A" }}; Due: {{ current_task.end_time|date:"M d, Y; h:i:s A" }}
+        </i></p>
+
+        <ul>
+            {% for website in website_list %}
+                <li>{{ website.website_regex }} (<a href="{% url 'website-block-update' website.id %}">Update</a>) (<a href="{% url 'website-block-delete' website.id %}">Delete</a>)</li>
+            {% endfor %}
+        </ul>
+        <h2>Create a new block:</h2>
+        <form method="POST">
+            {% csrf_token %}
+            {{ website_block_form }}
+            <button type="submit">Submit</button>
+        </form>
+        </main>
+    </body>
+</html>

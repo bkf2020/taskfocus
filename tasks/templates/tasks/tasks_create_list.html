@@ -13,7 +13,7 @@
         <a href="{% url 'tasks-finished' %}">View tasks that are finished</a>
         <ul>
             {% for task in user_tasks %}
-                <li>{{ task.info }} (<a href="{% url 'tasks-update' task.id %}">Update</a>)</li>
+                <li>{{ task.info }} (<a href="{% url 'tasks-update' task.id %}">Update</a>) (<a href="{% url 'tasks-website-list' task.id %}">Blocklist/Whitelist</a>)</li>
                 <ul class="timer" curr-server-time="{{ current_server_time|date:'U' }}" start-time="{{ task.start_time|date:'U' }}" end-time="{{ task.end_time|date:'U' }}">
                     <li><i>Start: {{ task.start_time|date:"M d, Y; h:i:s A" }}</i></li>
                     <li><i>Due: {{ task.end_time|date:"M d, Y; h:i:s A" }}</i></li>

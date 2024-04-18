@@ -10,3 +10,4 @@ class Task(models.Model):
 
 class WebsiteBlock(models.Model):
     website_regex = models.CharField(default="", max_length=10000)
+    task_id = models.IntegerField(default=0)

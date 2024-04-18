@@ -1,0 +1,21 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<title>Taskfocus: Update website block</title>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+	</head>
+    <body>
+        <main>
+        <h1>Taskfocus: Update website block</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form }}
+			<button type="submit" class="bg-blue">Update website block</button>
+            <a href="{% url 'tasks-website-list' object.task_id %}" class="buttonLink bg-gray">Cancel</button>
+        </form>
+        </main>
+    </body>
+</html>
