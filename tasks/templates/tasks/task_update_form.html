@@ -1,0 +1,19 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<title>Taskfocus: Update Task</title>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+	</head>
+    <body>
+        <main>
+        <h1>Taskfocus: Update Task</h1>
+        <form method="post">{% csrf_token %}
+            {{ form }}
+			<button type="submit">Update task</button>
+            <a href="{% url 'tasks-create-list' %}">Cancel</button>
+        </form>
+    </body>
+</html>

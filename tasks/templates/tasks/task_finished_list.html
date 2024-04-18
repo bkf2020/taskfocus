@@ -1,0 +1,25 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<title>Taskfocus: Task Finished List</title>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+	</head>
+    <body>
+        <main>
+        <h1>Taskfocus: Task Finished List</h1>
+        <a href="{% url 'tasks-create-list' %}">View tasks in progress</a>
+        <ul>
+            {% for task in user_tasks %}
+                <li>{{ task.info }} (<a href="{% url 'tasks-update' task.id %}">Update</a>)</li>
+                <ul>
+                    <li><i>Start: {{ task.start_time|date:"M d, Y; h:i:s A" }}</i></li>
+                    <li><i>Due: {{ task.end_time|date:"M d, Y; h:i:s A" }}</i></li>
+                </ul>
+            {% endfor %}
+        </ul>
+        </main>
+    </body>
+</html>
