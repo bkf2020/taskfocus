@@ -35,7 +35,10 @@ function updateTimers() {
             timers[i].querySelector('.starting-desc').innerText = "Ending in: ";
             setTimeout(updateTimers, 100);
         } else {
-            timers[i].querySelector('.starting-desc').innerText = "Completed: ";
+            timers[i].querySelector('.starting-desc').innerText = "Time's up: ";
+            timers[i].querySelector('.hour').innerText = "0h";
+            timers[i].querySelector('.min').innerText = "0m";
+            timers[i].querySelector('.sec').innerText = "0s";
         }
 	}
 }
