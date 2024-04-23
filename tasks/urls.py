@@ -9,4 +9,5 @@ urlpatterns = [
     path('<int:pk>/websites/', views.task_website_list, name='tasks-website-list'),
     path('website/<int:pk>/delete/', WebsiteBlockDeleteView.as_view(), name='website-block-delete'),
     path('website/<int:pk>/update/', WebsiteBlockUpdateView.as_view(), name='website-block-update'),
+    path('json/', views.get_tasks_and_websites_json, name='tasks-and-websites-json'),
 ]

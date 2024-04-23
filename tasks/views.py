@@ -4,6 +4,7 @@ from .models import Task, WebsiteBlock
 from django.urls import path, include
 from django.views.generic.edit import UpdateView, DeleteView
 from django.utils import timezone
+from django.http import JsonResponse
 
 def tasks_create_list(request):
     if request.method == 'POST':
@@ -56,6 +57,23 @@ def task_finished_list(request):
         'user_tasks': user_tasks
     }
     return render(request, 'tasks/task_finished_list.html', context)
+
+def get_tasks_and_websites_json(request):
+    tasks_and_websites = {}
+    user_tasks = Task.objects.filter(completed=False).order_by("id")
+    for task in user_tasks:
+        tasks_and_websites[task.id] = {
+            "info": task.info,
+            "start_time": task.start_time.timestamp(),
+            "end_time": task.end_time.timestamp(),
+            "completed": task.completed,
+            "whitelist": task.whitelist
+        }
+        website_list = WebsiteBlock.objects.filter(task_id=task.id).order_by("id")
+        tasks_and_websites[task.id]["websites"] = []
+        for website in website_list:
+            tasks_and_websites[task.id]["websites"].append(website.website_regex)
+    return JsonResponse(tasks_and_websites)
 
 class TaskUpdateView(UpdateView):
     model = Task
