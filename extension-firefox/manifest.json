@@ -17,7 +17,7 @@
 		"declarativeNetRequest",
 		"tabs",
 		"storage",
-		"nativeMessaging",
+		"alarms",
 		"notifications"
 	],
 	"host_permissions": [
@@ -41,11 +41,9 @@
 		  "matches": ["*://*/*"],
 		  "js": ["ping.js"]
 		}
-	],	 
+	],
 	"background": {
-		"service_worker": "background.js",
-		"scripts": ["background.js"],
-		"persistent": "false"
+		"scripts": ["background.js"]
 	},
 	"manifest_version": 3
 }

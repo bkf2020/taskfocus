@@ -15,9 +15,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-chrome.runtime.onInstalled.addListener(async () => {
-	chrome.alarms.create({ periodInMinutes: 1 });
+browser.runtime.onMessage.addListener(function respond() {
+	console.log("test");
 });
+chrome.alarms.create({ periodInMinutes: 1 });
 chrome.alarms.onAlarm.addListener(
 	async function updateRules() {
 		chrome.storage.sync.get(['userRules'], async function(result) {
@@ -28,21 +29,9 @@ chrome.alarms.onAlarm.addListener(
 				rules_id.push(i);
 			}
 			rules_id.push(10000);
-			chrome.notifications.create({
-				"iconUrl": "/icon.jpg",
-				"message": "removing" + (result.userRules.length + 1),
-				"title": "liblock",
-				"type": "basic"
-			});
-			chrome.declarativeNetRequest.updateDynamicRules({"removeRuleIds": rules_id});
+			chrome.declarativeNetRequest.updateSessionRules({"removeRuleIds": rules_id});
 			var oldRules = await chrome.declarativeNetRequest.getDynamicRules();
 			console.log(oldRules);
-			chrome.notifications.create({
-				"iconUrl": "/icon.jpg",
-				"message": "ids" + ids,
-				"title": "liblock",
-				"type": "basic"
-			});
 			return true;
 		});
 
@@ -121,7 +110,7 @@ chrome.alarms.onAlarm.addListener(
 		}
 
 		if (rules_json.length > 0) {
-			chrome.declarativeNetRequest.updateDynamicRules({"addRules": rules_json});
+			chrome.declarativeNetRequest.updateSessionRules({"addRules": rules_json});
 		}
 		chrome.storage.sync.set({rules_json: rules_json});
 		chrome.storage.sync.set({whitelist: whitelist});
@@ -136,17 +125,19 @@ chrome.alarms.onAlarm.addListener(
 			}
 		}
 		if(whitelist[0]) {
+			var acceptedTabIds = [];
+			chrome.tabs.query({"url" : rules_url_pattern}).then(function(result2) {
+				for(var i = 0; i < result2.length; i++) {
+					acceptedTabIds.push(result2[i].id);
+				}
+			});
+			console.log(acceptedTabIds);
 			chrome.tabs.query({"url" : "*://*/*"}).then(function(result) {
-				var acceptedTabs = [];
-				chrome.tabs.query({"url" : rules_url_pattern}).then(function(result2) {
-					for(var i = 0; i < result2.length; i++) {
-						acceptedTabs.push(result2[i]);
-					}
-				});
 				for(var i = 0; i < result.length; i++) {
-					var tab = result[i];
-					if(!acceptedTabs.includes(tab)) {
-						chrome.tabs.remove(tab.id);
+					var tabId = result[i].id;
+					console.log(acceptedTabIds.includes(tabId));
+					if(!acceptedTabIds.includes(tabId)) {
+						chrome.tabs.remove(tabId);
 					}
 				}
 			});
@@ -168,11 +159,5 @@ chrome.alarms.onAlarm.addListener(
 		}
 
 		chrome.storage.sync.set({userRules: rules_not_empty});
-		chrome.notifications.create({
-			"iconUrl": "/icon.jpg",
-			"message": "test",
-			"title": "liblock",
-			"type": "basic"
-		});
 	}
 );
