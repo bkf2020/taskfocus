@@ -15,6 +15,57 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+let tasksHost = "localhost";
+
+chrome.runtime.onInstalled.addListener(function(details){
+  var rules_json = [];
+  rules_json.push({
+		"id": 10000,
+		"priority": 1,
+		"action": { "type": "block" },
+		"condition": {
+			"urlFilter": '*',
+			"resourceTypes": [
+				"main_frame",
+				"sub_frame"
+			]
+		}
+	});
+  rules_json.push({
+		"id": 1,
+		"priority": 1,
+		"action": { "type": "allow" },
+		"condition": {
+			"urlFilter": "||" + tasksHost,
+			"resourceTypes": [
+				"main_frame",
+				"sub_frame"
+			]
+		}
+	});
+  chrome.declarativeNetRequest.updateDynamicRules({"removeRuleIds": [1, 10000]});
+  chrome.declarativeNetRequest.updateDynamicRules({"addRules": rules_json});
+
+  var acceptedTabIds = [];
+	var rules_url_pattern = ["*://*." + tasksHost + "/*"];
+
+  chrome.tabs.query({"url" : rules_url_pattern}).then(function(result2) {
+		for(var i = 0; i < result2.length; i++) {
+			acceptedTabIds.push(result2[i].id);
+		}
+	});
+  chrome.tabs.query({"url" : "*://*/*"}).then(function(result) {
+  	for(var i = 0; i < result.length; i++) {
+  		var tabId = result[i].id;
+  		console.log(acceptedTabIds.includes(tabId));
+  		if(!acceptedTabIds.includes(tabId)) {
+  			chrome.tabs.remove(tabId);
+  		}
+  	}
+	});
+  chrome.storage.sync.set({userRules: [tasksHost]});
+});
+
 chrome.alarms.create({ periodInMinutes: 1 });
 chrome.alarms.onAlarm.addListener(
 	async function updateRules() {
@@ -35,7 +86,7 @@ chrome.alarms.onAlarm.addListener(
 		var rules = [];
 		var whitelist = [];
 		try {
-			const tasks = await fetch("http://localhost:8000/tasks/json/");
+			const tasks = await fetch("http://" + tasksHost + ":8000/tasks/json/");
 			const tasksData = await tasks.json();
 			for(var idx in tasksData) {
 				if(tasksData[idx]["start_time"] * 1000 <= Date.now() && Date.now() <= tasksData[idx]["end_time"] * 1000) {
@@ -49,10 +100,8 @@ chrome.alarms.onAlarm.addListener(
 			console.error("Error:", error);
 		}
 
-		if(whitelist.length > 0 && whitelist[0]) {
-			rules.push("localhost");
-			whitelist.push(true);
-		}
+		rules.push(tasksHost);
+		whitelist.push(true);
 
 		var rules_json = [];
 		var curr_id = 1;
@@ -91,20 +140,20 @@ chrome.alarms.onAlarm.addListener(
 				}
 			}
 		}
-		if(whitelist.length > 0 && whitelist[0]) {
-			rules_json.push({
-				"id": 10000,
-				"priority": 1,
-				"action": { "type": "block" },
-				"condition": {
-					"urlFilter": '*',
-					"resourceTypes": [
-						"main_frame",
-						"sub_frame"
-					]
-				}
-			});
-		}
+
+  chrome.declarativeNetRequest.updateDynamicRules({"removeRuleIds": [10000]});
+		rules_json.push({
+			"id": 10000,
+			"priority": 1,
+			"action": { "type": "block" },
+			"condition": {
+				"urlFilter": '*',
+				"resourceTypes": [
+					"main_frame",
+					"sub_frame"
+				]
+			}
+		});
 
 		if (rules_json.length > 0) {
 			chrome.declarativeNetRequest.updateDynamicRules({"addRules": rules_json});
