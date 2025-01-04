@@ -18,8 +18,17 @@ class WebsiteBlockForm(ModelForm):
         model = WebsiteBlock
         fields = ["website_regex"]
 
+    def __init__(self, *args, **kwargs):
+        self.pk = kwargs.pop('pk', None)
+        super().__init__(*args, **kwargs)
+
     def clean_website_regex(self):
         website_regex = self.cleaned_data.get('website_regex')
+        print(self.pk)
+        start_time = Task.objects.get(id=self.pk).start_time
+        end_time = Task.objects.get(id=self.pk).end_time
+        if end_time >= timezone.now() and timezone.now() >= start_time:
+            raise ValidationError("You cannot add new whitelist websites")
         validator_not_tld(website_regex)
         return website_regex
 
@@ -41,5 +50,10 @@ class WebsiteBlockUpdateForm(ModelForm):
 
     def clean_website_regex(self):
         website_regex = self.cleaned_data.get('website_regex')
+        print(self.instance.task_id)
+        start_time = Task.objects.get(id=self.instance.task_id).start_time
+        end_time = Task.objects.get(id=self.instance.task_id).end_time
+        if end_time >= timezone.now() and timezone.now() >= start_time:
+            raise ValidationError("You cannot update whitelisted websites")
         validator_not_tld(website_regex)
         return website_regex

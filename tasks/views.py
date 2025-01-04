@@ -19,7 +19,7 @@ def tasks_create_list(request):
             return redirect(f'/tasks/')
     else:
         task_form = TaskForm()
-    
+
     user_tasks = Task.objects.filter(completed=False).order_by("id")
     context = {
         'task_form': task_form,
@@ -33,7 +33,7 @@ def task_website_list(request, pk):
         return redirect('/tasks/')
     current_task = Task.objects.filter(id=pk).first()
     if request.method == 'POST':
-        website_block_form = WebsiteBlockForm(request.POST)
+        website_block_form = WebsiteBlockForm(request.POST, pk=pk)
         if website_block_form.is_valid():
             new_website = WebsiteBlock(
                 website_regex=website_block_form.cleaned_data.get('website_regex'),
@@ -90,7 +90,7 @@ class WebsiteBlockDeleteView(DeleteView):
 
 class WebsiteBlockUpdateView(UpdateView):
     model = WebsiteBlock
-    form_class = WebsiteBlockUpdateForm
     template_name_suffix = '_update_form'
+    form_class = WebsiteBlockUpdateForm
     def get_success_url(self):
         return f"/tasks/{self.get_object().task_id}/websites/"
