@@ -2,6 +2,12 @@ from django.forms import ModelForm, ValidationError
 from .models import Task, WebsiteBlock
 from django.utils import timezone
 
+def validator_not_tld(website_regex):
+    with open("tasks/tlds.txt", 'r') as f:
+        for line in f:
+            if website_regex.lower() == line.strip().lower():
+                raise ValidationError("You can't submit a TLD!")
+
 class TaskForm(ModelForm):
     class Meta:
         model = Task
@@ -11,6 +17,11 @@ class WebsiteBlockForm(ModelForm):
     class Meta:
         model = WebsiteBlock
         fields = ["website_regex"]
+
+    def clean_website_regex(self):
+        website_regex = self.cleaned_data.get('website_regex')
+        validator_not_tld(website_regex)
+        return website_regex
 
 class TaskUpdateForm(ModelForm):
     class Meta:
@@ -27,3 +38,8 @@ class WebsiteBlockUpdateForm(ModelForm):
     class Meta:
         model = WebsiteBlock
         fields = ["website_regex"]
+
+    def clean_website_regex(self):
+        website_regex = self.cleaned_data.get('website_regex')
+        validator_not_tld(website_regex)
+        return website_regex
